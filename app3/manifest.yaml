@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - name: love
-        image: vidya07422/love:v2
+        image: vidya07422/love:v3
 ---
 apiVersion: v1
 kind: Service
@@ -57,7 +57,7 @@ metadata:
 spec:
   ingressClassName: alb
   rules:
-  - host: "loves.bavs.space"
+  - host: "lovess.bavs.space"
     http:
       paths:
       - pathType: Prefix

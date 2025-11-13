@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app2
+  labels:
+    purpose: ingress
+    project: roboshop
+    tier: app2
+spec:
+  # modify replicas according to your case
+  replicas: 2
+  selector:
+    matchLabels:
+      purpose: ingress
+      project: roboshop
+      tier: app2
+  template:
+    metadata:
+      labels:
+        purpose: ingress
+        project: roboshop
+        tier: app2
+    spec:
+      containers:
+      - name: app2
+        image: vidya07422/app2:v1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app2-service
+  labels:
+    purpose: ingress
+    project: roboshop
+    tier: app2
+spec:
+  selector:
+  # taken from 04-labels.yaml pod
+    purpose: ingress
+    project: roboshop
+    tier: app2
+  ports:
+    - protocol: TCP
+      port: 80 # service port
+      targetPort: 80 # app/container port
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-app2-host
+  annotations:
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:697576974187:certificate/113fce76-eac2-47a3-bc45-53fe021a703e
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/group.name: devops-practice
+spec:
+  ingressClassName: alb
+  rules:
+  - host: "app2.bavs.space"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: app2-service
+            port:
+              number: 80
